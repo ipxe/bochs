@@ -542,40 +542,10 @@ void BX_CPU_C::PAVGW_PqQq(bxInstruction_c *i)
 #endif
 }
 
-void BX_CPU_C::PMULHUW_PqQq(bxInstruction_c *i)
-{
-#if BX_SUPPORT_SSE
-  BX_PANIC(("SSE Instruction PMULHUW_PqQq still not implemented"));
-#else
-  BX_INFO(("SSE Instructions Set Not Implemented"));
-  UndefinedOpcode(i);
-#endif
-}
-
 void BX_CPU_C::MOVNTQ_MqPq(bxInstruction_c *i)
 {
 #if BX_SUPPORT_SSE
   BX_PANIC(("SSE Instruction MOVNTQ_MqPq still not implemented"));
-#else
-  BX_INFO(("SSE Instructions Set Not Implemented"));
-  UndefinedOpcode(i);
-#endif
-}
-
-void BX_CPU_C::PMINSW_PqQq(bxInstruction_c *i)
-{
-#if BX_SUPPORT_SSE
-  BX_PANIC(("SSE Instruction PMINSW_PqQq still not implemented"));
-#else
-  BX_INFO(("SSE Instructions Set Not Implemented"));
-  UndefinedOpcode(i);
-#endif
-}
-
-void BX_CPU_C::PMAXSW_PqQq(bxInstruction_c *i)
-{
-#if BX_SUPPORT_SSE
-  BX_PANIC(("SSE Instruction PMAXSW_PqQq still not implemented"));
 #else
   BX_INFO(("SSE Instructions Set Not Implemented"));
   UndefinedOpcode(i);
@@ -645,7 +615,8 @@ void BX_CPU_C::FXRSTOR(bxInstruction_c *i)
 void BX_CPU_C::PREFETCH(bxInstruction_c *i)
 {
 #if BX_SUPPORT_SSE
-  BX_PANIC(("SSE Instruction PREFETCH still not implemented"));
+/* !!! DO NOT REPLACE THIS BY NOP OPCODE, I NEED IT FOR INSTRUMENTATION !!! */
+/* !!! BX_PANIC(("SSE Instruction PREFETCH still not implemented")); !!!!!! */
 #else
   BX_INFO(("SSE Instructions Set Not Implemented"));
   UndefinedOpcode(i);
