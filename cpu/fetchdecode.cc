@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////
-// $Id: fetchdecode.cc,v 1.27.4.2 2002-10-07 22:45:23 sshwarts Exp $
+// $Id: fetchdecode.cc,v 1.27.4.3 2002-10-08 06:10:25 sshwarts Exp $
 /////////////////////////////////////////////////////////////////////////
 //
 //  Copyright (C) 2001  MandrakeSoft S.A.
@@ -2488,83 +2488,6 @@ BX_PANIC(("fetch_decode: prefix default = 0x%02x", b1));
     else
       return(0);
 
-    if (attr & BxGroupN) {
-      BxOpcodeInfo_t *OpcodeInfoPtr = BxOpcodeInfo[b1+offset].AnotherArray;
-      // get additional attributes from group table
-      attr |= OpcodeInfoPtr[nnn].Attr;
-      instruction->setRepAttr(attr & (BxRepeatable | BxRepeatableZF));
-#if BX_DYNAMIC_TRANSLATION
-      instruction->DTAttr = 0; // for now
-#endif
-      /* For SSE opcodes, look into another 4 entries table 
-                        with the opcode prefixes (NONE, 0x66, 0xF2, 0xF3 */
-      if (attr & BxPrefixSSE) {
-        int op = sse_prefix_index[sse_prefix];
-        if(op < 0) BX_PANIC(("fetchdecode: SSE opcode with two or more prefixes"));
-        else {
-           OpcodeInfoPtr = OpcodeInfoPtr[nnn].AnotherArray;
-           instruction->execute = OpcodeInfoPtr[op].ExecutePtr;
-           attr |= OpcodeInfoPtr[nnn].Attr; 
-        }
-      }
-      // For high frequency opcodes, two variants of the instruction are
-      // implemented; one for the mod=11b case (Reg-Reg), and one for
-      // the other cases (Reg-Mem).  If this is one of those cases,
-      // we need to dereference to get to the execute pointer.
-      else if (attr & BxSplitMod11b) {
-        OpcodeInfoPtr = OpcodeInfoPtr[nnn].AnotherArray;
-        instruction->execute = OpcodeInfoPtr[mod==0xc0].ExecutePtr;
-      }
-      else
-        instruction->execute = OpcodeInfoPtr[nnn].ExecutePtr;
-     }
-    else {  /* BxGroupN */
-#if BX_DYNAMIC_TRANSLATION
-      instruction->DTAttr = BxDTOpcodeInfo[b1+offset].DTAttr;
-      instruction->DTFPtr = BxDTOpcodeInfo[b1+offset].DTASFPtr;
-#endif
-      /* For SSE opcodes, look into another 4 entries table 
-                        with the opcode prefixes (NONE, 0x66, 0xF2, 0xF3 */
-      if (attr & BxPrefixSSE) {
-        int op = sse_prefix_index[sse_prefix];
-        if(op < 0) BX_PANIC(("fetchdecode: SSE opcode with two or more prefixes"));
-        else {
-           BxOpcodeInfo_t *OpcodeInfoPtr = BxOpcodeInfo[b1+offset].AnotherArray;
-           instruction->execute = OpcodeInfoPtr[op].ExecutePtr;
-           attr |= OpcodeInfoPtr[nnn].Attr; 
-        }
-      }
-      // (See note immediately above for comment)
-      else if (attr & BxSplitMod11b) {
-        BxOpcodeInfo_t *OpcodeInfoPtr = BxOpcodeInfo[b1+offset].AnotherArray;
-        instruction->execute = OpcodeInfoPtr[mod==0xc0].ExecutePtr;
-      }
-      else
-        instruction->execute = BxOpcodeInfo[b1+offset].ExecutePtr;
-      }
-    }
-
-#if BX_SUPPORT_FPU == 0
-    if (attr & BxOpcodeFPU) {          // Prevent fetching of extra 
-	goto imm_done;                 //    opcode bytes if the instruction
-    }                                  //       is not supported in 
-#endif                                 //           current configuration
-#if BX_SUPPORT_MMX == 0
-    if (attr & BxOpcodeMMX) { 
-	goto imm_done;
-    }
-#endif
-#if BX_SUPPORT_SSE == 0
-    if (attr & BxOpcodeSSE) {
-	goto imm_done;
-    }
-#endif
-#if BX_SUPPORT_SSE2 == 0
-    if (attr & BxOpcodeSSE2) {
-	goto imm_done;
-    }
-#endif
-
     // Parse mod-nnn-rm and related bytes
     mod   = b2 & 0xc0; // leave unshifted
     nnn   = (b2 >> 3) & 0x07;
@@ -2784,6 +2707,63 @@ get_32bit_displ:
       }
 
 modrm_done:
+    if (attr & BxGroupN) {
+      BxOpcodeInfo_t *OpcodeInfoPtr;
+
+      OpcodeInfoPtr = BxOpcodeInfo[b1+offset].AnotherArray;
+      // get additional attributes from group table
+      attr |= OpcodeInfoPtr[nnn].Attr;
+      instruction->setRepAttr(attr & (BxRepeatable | BxRepeatableZF));
+#if BX_DYNAMIC_TRANSLATION
+      instruction->DTAttr = 0; // for now
+#endif
+      /* For SSE opcodes, look into another 4 entries table 
+                        with the opcode prefixes (NONE, 0x66, 0xF2, 0xF3 */
+      if (attr & BxPrefixSSE) {
+        int op = sse_prefix_index[sse_prefix];
+        if(op < 0) BX_PANIC(("fetchdecode: SSE opcode with two or more prefixes"));
+        else {
+           OpcodeInfoPtr = OpcodeInfoPtr[nnn].AnotherArray;
+           instruction->execute = OpcodeInfoPtr[op].ExecutePtr;
+           attr |= OpcodeInfoPtr[op].Attr; 
+        }
+      }
+      // For high frequency opcodes, two variants of the instruction are
+      // implemented; one for the mod=11b case (Reg-Reg), and one for
+      // the other cases (Reg-Mem).  If this is one of those cases,
+      // we need to dereference to get to the execute pointer.
+      if (attr & BxSplitMod11b) {
+        OpcodeInfoPtr = OpcodeInfoPtr[nnn].AnotherArray;
+        instruction->execute = OpcodeInfoPtr[mod==0xc0].ExecutePtr;
+        }
+      else
+        instruction->execute = OpcodeInfoPtr[nnn].ExecutePtr;
+      }
+    else {
+#if BX_DYNAMIC_TRANSLATION
+      instruction->DTAttr = BxDTOpcodeInfo[b1+offset].DTAttr;
+      instruction->DTFPtr = BxDTOpcodeInfo[b1+offset].DTASFPtr;
+#endif
+      /* For SSE opcodes, look into another 4 entries table 
+                        with the opcode prefixes (NONE, 0x66, 0xF2, 0xF3 */
+      if (attr & BxPrefixSSE) {
+        int op = sse_prefix_index[sse_prefix];
+        if(op < 0) BX_PANIC(("fetchdecode: SSE opcode with two or more prefixes"));
+        else {
+           BxOpcodeInfo_t *OpcodeInfoPtr = BxOpcodeInfo[b1+offset].AnotherArray;
+           instruction->execute = OpcodeInfoPtr[op].ExecutePtr;
+           attr |= OpcodeInfoPtr[op].Attr; 
+        }
+      }
+      // (See note immediately above for comment)
+      if (attr & BxSplitMod11b) {
+        BxOpcodeInfo_t *OpcodeInfoPtr = BxOpcodeInfo[b1+offset].AnotherArray;
+        instruction->execute = OpcodeInfoPtr[mod==0xc0].ExecutePtr;
+        }
+      else
+        instruction->execute = BxOpcodeInfo[b1+offset].ExecutePtr;
+    }
+  }
 
   imm_mode = attr & BxImmediate;
 
