@@ -5,17 +5,14 @@
 #if BX_SUPPORT_SSE
 void BX_CPU_C::PrepareSseInstruction(void)
 {
-  if(! (BX_CPU_THIS_PTR v8086_mode())) 
-  {
-    if(BX_CPU_THIS_PTR cr0.ts)
-      exception(BX_NM_EXCEPTION, 0, 0);
+  if(BX_CPU_THIS_PTR cr0.ts)
+    exception(BX_NM_EXCEPTION, 0, 0);
 
-    if(BX_CPU_THIS_PTR cr0.em)
-      exception(BX_UD_EXCEPTION, 0, 0);
+  if(BX_CPU_THIS_PTR cr0.em)
+    exception(BX_UD_EXCEPTION, 0, 0);
 
-    if(! (BX_CPU_THIS_PTR cr4.get_OSXMMEXCPT()))
-      exception(BX_UD_EXCEPTION, 0, 0);
-  }
+  if(! (BX_CPU_THIS_PTR cr4.get_OSXMMEXCPT()))
+    exception(BX_UD_EXCEPTION, 0, 0);
 }
 #endif
 
@@ -585,17 +582,6 @@ void BX_CPU_C::FXRSTOR(bxInstruction_c *i)
 {
 #if BX_SUPPORT_SSE
   BX_PANIC(("SSE Instruction FXRSTOR still not implemented"));
-#else
-  BX_INFO(("SSE instruction set not supported in current configuration"));
-  UndefinedOpcode(i);
-#endif
-}
-
-void BX_CPU_C::PREFETCH(bxInstruction_c *i)
-{
-#if BX_SUPPORT_SSE
-/* !!! DO NOT REPLACE THIS BY NOP OPCODE, I NEED IT FOR INSTRUMENTATION !!! */
-/* !!! BX_PANIC(("SSE Instruction PREFETCH still not implemented")); !!!!!! */
 #else
   BX_INFO(("SSE instruction set not supported in current configuration"));
   UndefinedOpcode(i);
