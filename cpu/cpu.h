@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////
-// $Id: cpu.h,v 1.98.2.6 2002-10-10 21:13:06 sshwarts Exp $
+// $Id: cpu.h,v 1.98.2.7 2002-10-11 16:34:38 bdenney Exp $
 /////////////////////////////////////////////////////////////////////////
 //
 //  Copyright (C) 2001  MandrakeSoft S.A.
@@ -2724,6 +2724,14 @@ union {
 #define Write_RMW_virtual_word(val16)  write_RMW_virtual_word(val16)
 #define Write_RMW_virtual_dword(val32) write_RMW_virtual_dword(val32)
 #define Write_RMW_virtual_qword(val32) write_RMW_virtual_qword(val32)
+
+#if BX_SUPPORT_SSE
+  BX_SMF void readVirtualDQword(unsigned s, bx_address off, Bit8u *data);
+  BX_SMF void readVirtualDQwordAligned(unsigned s, bx_address off, Bit8u *data);
+  BX_SMF void writeVirtualDQword(unsigned s, bx_address off, Bit8u *data);
+  BX_SMF void writeVirtualDQwordAligned(unsigned s, bx_address off, Bit8u *data);
+#endif
+
 
   BX_SMF void access_linear(bx_address address, unsigned length, unsigned pl,
                      unsigned rw, void *data);
