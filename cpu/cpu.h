@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////
-// $Id: cpu.h,v 1.98.2.5 2002-10-09 20:59:23 sshwarts Exp $
+// $Id: cpu.h,v 1.98.2.6 2002-10-10 21:13:06 sshwarts Exp $
 /////////////////////////////////////////////////////////////////////////
 //
 //  Copyright (C) 2001  MandrakeSoft S.A.
@@ -2039,6 +2039,10 @@ union {
 #if BX_SUPPORT_MMX || BX_SUPPORT_SSE || BX_SUPPORT_SSE2
   BX_SMF void PrepareMmxInstruction(void);
   BX_SMF void PrintMmxRegisters(void);
+#endif
+
+#if BX_SUPPORT_SSE
+  BX_SMF void PrepareSseInstruction(void);
 #endif
 
   /* SSE */
