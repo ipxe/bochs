@@ -72,6 +72,11 @@ static Bit16u SaturateDwordSToWordU(Bit32s value)
   return value;
 }
 
+static Bit16u SelectMmxWord(BxPackedMmxRegister mmx, unsigned index)
+{
+  return (MMXUQ(mmx) >> ((index & 0x3) * 16)) & 0xffff;
+}
+
 void BX_CPU_C::PrintMmxRegisters(void)
 {
   for(int i=0;i<8;i++) {
@@ -93,7 +98,7 @@ void BX_CPU_C::PrepareMmxInstruction(void)
 
   MMX_TWD = 0;
   MMX_TOS = 0;        /* Each time an MMX instruction is */
-  MMX_SWD &= 0xc7ff;  /*    executed, the TOS value is set to 000B */
+  MMX_SWD &= 0xc7ff;  /*    executed, the TOS value is set to 000b */
 }
 #endif
 
@@ -524,7 +529,37 @@ void BX_CPU_C::MOVQ_PqQq(bxInstruction_c *i)
 #endif
 }
 
-/* 0F 74 */
+/* 0F 70 */
+void BX_CPU_C::PSHUFW_PqQqIb(bxInstruction_c *i)
+{
+#if BX_SUPPORT_SSE
+  BX_CPU_THIS_PTR PrepareMmxInstruction();
+
+  BxPackedMmxRegister op, result;
+  Bit16u order = i->Ib();
+
+  /* op2 is a register or memory reference */
+  if (i->modC0()) {
+    op = BX_READ_MMX_REG(i->rm());
+  }
+  else {
+    /* pointer, segment address pair */
+    read_virtual_qword(i->seg(), RMAddr(i), (Bit64u *) &op);
+  }
+
+  MMXUW0(result) = SelectMmxWord(op, order);
+  MMXUW1(result) = SelectMmxWord(op, order >> 2);
+  MMXUW2(result) = SelectMmxWord(op, order >> 4);
+  MMXUW3(result) = SelectMmxWord(op, order >> 5);
+
+  /* now write result back to destination */
+  BX_WRITE_MMX_REG(i->nnn(), result);
+#else  
+  BX_INFO(("SSE instruction set not supported in current configuration"));
+  UndefinedOpcode(i);
+#endif
+}
+
 void BX_CPU_C::PCMPEQB_PqQq(bxInstruction_c *i)
 {
 #if BX_SUPPORT_MMX
@@ -627,9 +662,9 @@ void BX_CPU_C::EMMS(bxInstruction_c *i)
   if(BX_CPU_THIS_PTR cr0.ts)
     exception(BX_NM_EXCEPTION, 0, 0);
 
-  MMX_TWD = 0xFFFFFFFF;
-  MMX_TOS = 0; /* Each time an MMX instruction is           */
-  MMX_SWD &= 0xC7FF;  /*    executed, the TOS value is set to 000B */
+  MMX_TWD = 0xffffffff;
+  MMX_TOS = 0;        /* Each time an MMX instruction is */
+  MMX_SWD &= 0xc7ff;  /*    executed, the TOS value is set to 000b */
 
 #else
   BX_INFO(("MMX instruction set not supported in current configuration"));
@@ -1679,7 +1714,7 @@ void BX_CPU_C::PMULUDQ_PqQq(bxInstruction_c *i)
     read_virtual_qword(i->seg(), RMAddr(i), (Bit64u *) &op2);
   }
 
-  MMXUQ(result) = (Bit64u)(MMXUD0(op1)) * (Bit64u)(MMXUD0(op2));
+  MMXUQ(result) = Bit64u(MMXUD0(op1)) * Bit64u(MMXUD0(op2));
 
   /* now write result back to destination */
   BX_WRITE_MMX_REG(i->nnn(), result);
@@ -1724,6 +1759,43 @@ void BX_CPU_C::PMADDWD_PqQq(bxInstruction_c *i)
   BX_WRITE_MMX_REG(i->nnn(), result);
 #else
   BX_INFO(("MMX instruction set not supported in current configuration"));
+  UndefinedOpcode(i);
+#endif
+}
+
+/* 0F F6 */
+void BX_CPU_C::PSADBW_PqQq(bxInstruction_c *i)
+{
+#if BX_SUPPORT_SSE
+  BX_CPU_THIS_PTR PrepareMmxInstruction();
+
+  BxPackedMmxRegister op1 = BX_READ_MMX_REG(i->nnn()), op2, result;
+  Bit16u temp = 0;
+
+  /* op2 is a register or memory reference */
+  if (i->modC0()) {
+    op2 = BX_READ_MMX_REG(i->rm());
+  }
+  else {
+    /* pointer, segment address pair */
+    read_virtual_qword(i->seg(), RMAddr(i), (Bit64u *) &op2);
+  }
+
+  temp += abs(MMXUB0(op1) - MMXUB0(op2));
+  temp += abs(MMXUB1(op1) - MMXUB1(op2));
+  temp += abs(MMXUB2(op1) - MMXUB2(op2));
+  temp += abs(MMXUB3(op1) - MMXUB3(op2));
+  temp += abs(MMXUB4(op1) - MMXUB4(op2));
+  temp += abs(MMXUB5(op1) - MMXUB5(op2));
+  temp += abs(MMXUB6(op1) - MMXUB6(op2));
+  temp += abs(MMXUB7(op1) - MMXUB7(op2));
+
+  MMXUW0(result) = Bit64u(temp);
+
+  /* now write result back to destination */
+  BX_WRITE_MMX_REG(i->nnn(), result);
+#else  
+  BX_INFO(("SSE instruction set not supported in current configuration"));
   UndefinedOpcode(i);
 #endif
 }
