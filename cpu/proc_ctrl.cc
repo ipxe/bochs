@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////
-// $Id: proc_ctrl.cc,v 1.55 2002-10-04 17:04:33 kevinlawton Exp $
+// $Id: proc_ctrl.cc,v 1.55.4.1 2002-10-09 20:59:23 sshwarts Exp $
 /////////////////////////////////////////////////////////////////////////
 //
 //  Copyright (C) 2001  MandrakeSoft S.A.
@@ -1430,10 +1430,17 @@ BX_CPU_C::CPUID(bxInstruction_c *i)
       features |= (1<<9);   // APIC on chip
 #  endif
 #  if BX_SUPPORT_FPU
-      features |= 0x01;     // has FPU
+      features |= 0x01;     // support FPU
 #  endif
 #  if BX_SUPPORT_MMX
       features |= (1<<23);  // support MMX
+#  endif
+#  if BX_SUPPORT_SSE
+      features |= (1<<24);  // support FSAVE/FXRSTOR
+      features |= (1<<25);  // support SSE
+#  endif
+#  if BX_SUPPORT_SSE2
+      features |= (1<<26);  // support SSE2
 #  endif
 
 #else
