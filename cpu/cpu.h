@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////
-// $Id: cpu.h,v 1.98.2.1 2002-10-06 18:45:18 sshwarts Exp $
+// $Id: cpu.h,v 1.98.2.2 2002-10-07 20:14:21 sshwarts Exp $
 /////////////////////////////////////////////////////////////////////////
 //
 //  Copyright (C) 2001  MandrakeSoft S.A.
@@ -2996,7 +2996,7 @@ IMPLEMENT_EFLAG_ACCESSOR   (TF,  8)
 #define BxPrefix          0x0010 // bit  4
 #define BxAnother         0x0020 // bit  5
 #define BxSplitMod11b     0x0040 // bit  6
-#define BxOpcodeSSE       0x0080 // bit  7
+#define BxPrefixSSE       0x0080 // bit  7
 #define BxRepeatable      0x0800 // bit 11 (pass through to metaInfo field)
 #define BxRepeatableZF    0x1000 // bit 12 (pass through to metaInfo field)
 #define BxGroupN          0x0100 // bits 8
@@ -3011,28 +3011,15 @@ IMPLEMENT_EFLAG_ACCESSOR   (TF,  8)
 #define BxGroup9          BxGroupN
 #define BxGroupA          BxGroupN
 
+#define BxOpcodeFPU       0x00010000
+#define BxOpcodeMMX       0x00020000
+#define BxOpcodeSSE       0x00040000
+#define BxOpcodeSSE       0x00080000
+
 #if BX_SUPPORT_FPU
 #define BxAnotherFPU      BxAnother
 #else
 #define BxAnotherFPU      (0)
-#endif
-
-#if BX_SUPPORT_MMX
-#define BxAnotherMMX      BxAnother
-#else
-#define BxAnotherMMX      (0)
-#endif
-
-#if BX_SUPPORT_SSE
-#define BxAnotherSSE      BxAnother
-#else
-#define BxAnotherSSE      (0)
-#endif
-
-#if BX_SUPPORT_SSE2
-#define BxAnotherSSE2     BxAnother
-#else
-#define BxAnotherSSE2     (0)
 #endif
 
 #define BxGroup12         BxGroupN
