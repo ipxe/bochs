@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////
-// $Id: cpu.h,v 1.98.2.4 2002-10-08 20:23:21 sshwarts Exp $
+// $Id: cpu.h,v 1.98.2.5 2002-10-09 20:59:23 sshwarts Exp $
 /////////////////////////////////////////////////////////////////////////
 //
 //  Copyright (C) 2001  MandrakeSoft S.A.
@@ -2036,7 +2036,7 @@ union {
   BX_SMF void PSLLQ_PqIb(bxInstruction_c *i);
   /* MMX */
 
-#if BX_SUPPORT_MMX
+#if BX_SUPPORT_MMX || BX_SUPPORT_SSE || BX_SUPPORT_SSE2
   BX_SMF void PrepareMmxInstruction(void);
   BX_SMF void PrintMmxRegisters(void);
 #endif
@@ -2047,7 +2047,9 @@ union {
   BX_SMF void LDMXCSR(bxInstruction_c *i);
   BX_SMF void STMXCSR(bxInstruction_c *i);
   BX_SMF void PREFETCH(bxInstruction_c *i);
+  /* SSE */
 
+  /* SSE */
   BX_SMF void MOVUPS_VpsWps(bxInstruction_c *i);
   BX_SMF void MOVSS_VssWss(bxInstruction_c *i);
   BX_SMF void MOVUPS_WpsVps(bxInstruction_c *i);
