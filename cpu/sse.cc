@@ -461,16 +461,6 @@ void BX_CPU_C::MAXSS_VssWss(bxInstruction_c *i)
 #endif
 }
 
-void BX_CPU_C::PSHUFW_PqQqIb(bxInstruction_c *i)
-{
-#if BX_SUPPORT_SSE
-  BX_PANIC(("SSE Instruction PSHUFW_PqQqIb still not implemented"));
-#else
-  BX_INFO(("SSE instruction set not supported in current configuration"));
-  UndefinedOpcode(i);
-#endif
-}
-
 void BX_CPU_C::PSHUFLW_VqWqIb(bxInstruction_c *i)
 {
 #if BX_SUPPORT_SSE
@@ -545,16 +535,6 @@ void BX_CPU_C::MOVNTQ_MqPq(bxInstruction_c *i)
 {
 #if BX_SUPPORT_SSE
   BX_PANIC(("SSE Instruction MOVNTQ_MqPq still not implemented"));
-#else
-  BX_INFO(("SSE instruction set not supported in current configuration"));
-  UndefinedOpcode(i);
-#endif
-}
-
-void BX_CPU_C::PSADBW_PqQq(bxInstruction_c *i)
-{
-#if BX_SUPPORT_SSE
-  BX_PANIC(("SSE Instruction PSADBW_PqQq still not implemented"));
 #else
   BX_INFO(("SSE instruction set not supported in current configuration"));
   UndefinedOpcode(i);
