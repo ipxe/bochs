@@ -522,26 +522,6 @@ void BX_CPU_C::PMOVMSKB_GdPRq(bxInstruction_c *i)
 #endif
 }
 
-void BX_CPU_C::PMINUB_PqQq(bxInstruction_c *i)
-{
-#if BX_SUPPORT_SSE
-  BX_PANIC(("SSE Instruction PMINUB_PqQq still not implemented"));
-#else
-  BX_INFO(("SSE Instructions Set Not Implemented"));
-  UndefinedOpcode(i);
-#endif
-}
-
-void BX_CPU_C::PMAXUB_PqQq(bxInstruction_c *i)
-{
-#if BX_SUPPORT_SSE
-  BX_PANIC(("SSE Instruction PMAXUB_PqQq still not implemented"));
-#else
-  BX_INFO(("SSE Instructions Set Not Implemented"));
-  UndefinedOpcode(i);
-#endif
-}
-
 void BX_CPU_C::PAVGB_PqQq(bxInstruction_c *i)
 {
 #if BX_SUPPORT_SSE

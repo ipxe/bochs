@@ -822,16 +822,6 @@ void BX_CPU_C::PSRLQ_VdqWdq(bxInstruction_c *i)
 #endif
 }
 
-void BX_CPU_C::PADDQ_PqQq(bxInstruction_c *i)
-{
-#if BX_SUPPORT_SSE2
-  BX_PANIC(("SSE2 Instruction PADDQ_PqQq still not implemented"));
-#else
-  BX_INFO(("SSE2 Instructions Set Not Implemented"));
-  UndefinedOpcode(i);
-#endif
-}
-
 void BX_CPU_C::PADDQ_VdqWdq(bxInstruction_c *i)
 {
 #if BX_SUPPORT_SSE2
@@ -1256,16 +1246,6 @@ void BX_CPU_C::PSUBD_VdqWdq(bxInstruction_c *i)
 {
 #if BX_SUPPORT_SSE2
   BX_PANIC(("SSE2 Instruction PSUBD_VdqWdq still not implemented"));
-#else
-  BX_INFO(("SSE2 Instructions Set Not Implemented"));
-  UndefinedOpcode(i);
-#endif
-}
-
-void BX_CPU_C::PSUBQ_PqQq(bxInstruction_c *i)
-{
-#if BX_SUPPORT_SSE2
-  BX_PANIC(("SSE2 Instruction PSUBQ_PqQq still not implemented"));
 #else
   BX_INFO(("SSE2 Instructions Set Not Implemented"));
   UndefinedOpcode(i);
