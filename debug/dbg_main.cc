@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////
-// $Id: dbg_main.cc,v 1.36 2001-11-28 18:38:32 instinc Exp $
+// $Id: dbg_main.cc,v 1.36.4.1 2002-03-25 08:02:49 bdenney Exp $
 /////////////////////////////////////////////////////////////////////////
 //
 //  Copyright (C) 2001  MandrakeSoft S.A.
@@ -416,14 +416,17 @@ process_sim2:
   // Print disassembly of the first instruction...  you wouldn't think it
   // would have to be so hard.  First initialize guard_found, since it is used
   // in the disassembly code to decide what instruction to print.
-  BX_CPU_THIS_PTR guard_found.cs =
-    BX_CPU_THIS_PTR sregs[BX_SEG_REG_CS].selector.value;
-  BX_CPU_THIS_PTR guard_found.eip =
-    BX_CPU_THIS_PTR prev_eip;
-  BX_CPU_THIS_PTR guard_found.laddr =
-    BX_CPU_THIS_PTR sregs[BX_SEG_REG_CS].cache.u.segment.base + BX_CPU_THIS_PTR prev_eip;
-  BX_CPU_THIS_PTR guard_found.is_32bit_code =
-    BX_CPU_THIS_PTR sregs[BX_SEG_REG_CS].cache.u.segment.d_b;
+  for (i=0; i<BX_SMP_PROCESSORS; i++) {
+    BX_CPU(i)->guard_found.cs =
+      BX_CPU(i)->sregs[BX_SEG_REG_CS].selector.value;
+    BX_CPU(i)->guard_found.eip =
+      BX_CPU(i)->prev_eip;
+    BX_CPU(i)->guard_found.laddr =
+      BX_CPU(i)->sregs[BX_SEG_REG_CS].cache.u.segment.base
+        + BX_CPU(i)->prev_eip;
+    BX_CPU(i)->guard_found.is_32bit_code =
+      BX_CPU(i)->sregs[BX_SEG_REG_CS].cache.u.segment.d_b;
+  }
   // finally, call the usual function to print the disassembly
   fprintf (stderr, "Next at t=%lld\n", bx_pc_system.time_ticks ());
   bx_dbg_disassemble_current (-1, 0);  // all cpus, don't print time
@@ -1582,6 +1585,12 @@ bx_dbg_continue_command(void)
 		  if (BX_CPU(cpu)->guard_found.icount > max_executed)
 			max_executed = BX_CPU(cpu)->guard_found.icount;
 		}
+		// potential deadlock if all processors are halted.  Then 
+		// max_executed will be 0, tick will be incremented by zero, and
+		// there will never be a timed event to wake them up.  To avoid this,
+		// always tick by a minimum of 1.
+		if (max_executed < 1) max_executed=1;
+
 		BX_TICKN(max_executed);
 #endif /* BX_SMP_PROCESSORS>1 */
 	}

@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////
-// $Id: cpu.cc,v 1.22 2001-11-14 01:39:22 bdenney Exp $
+// $Id: cpu.cc,v 1.22.4.1 2002-03-25 08:02:49 bdenney Exp $
 /////////////////////////////////////////////////////////////////////////
 //
 //  Copyright (C) 2001  MandrakeSoft S.A.
@@ -100,7 +100,6 @@ extern void REGISTER_IADDR(Bit32u addr);
 #else
 #  define BX_TICK1_IF_SINGLE_PROCESSOR()
 #endif
-
 
 #if BX_DYNAMIC_TRANSLATION == 0
   void
@@ -279,8 +278,11 @@ repeat_not_done:
 
 #if BX_DEBUGGER
     if (BX_CPU_THIS_PTR trace) {
-      // print the instruction that was just executed.
+#if BX_SMP_PROCESSORS==1
       bx_dbg_disassemble_current (-1, 1);  // all cpus, print time stamp
+#else
+      bx_dbg_disassemble_current (local_apic.get_id (), 1);  // trace this cpu
+#endif
     }
 #endif
       BX_TICK1_IF_SINGLE_PROCESSOR();
@@ -315,7 +317,11 @@ repeat_done:
 #if BX_DEBUGGER
     if (BX_CPU_THIS_PTR trace) {
       // print the instruction that was just executed.
+#if BX_SMP_PROCESSORS==1
       bx_dbg_disassemble_current (-1, 1);  // all cpus, print time stamp
+#else
+      bx_dbg_disassemble_current (local_apic.get_id (), 1);  // trace this cpu
+#endif
     }
 #endif
     BX_TICK1_IF_SINGLE_PROCESSOR();
