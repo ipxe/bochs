@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////
-// $Id: proc_ctrl.cc,v 1.55.4.1 2002-10-09 20:59:23 sshwarts Exp $
+// $Id: proc_ctrl.cc,v 1.55.4.2 2002-10-11 16:38:22 sshwarts Exp $
 /////////////////////////////////////////////////////////////////////////
 //
 //  Copyright (C) 2001  MandrakeSoft S.A.
@@ -47,14 +47,22 @@
   void
 BX_CPU_C::UndefinedOpcode(bxInstruction_c *i)
 {
-  BX_DEBUG(("UndefinedOpcode: %02x causes exception 6",
-              (unsigned) i->b1()));
+  BX_DEBUG(("UndefinedOpcode: %02x causes exception 6", (unsigned) i->b1()));
   exception(BX_UD_EXCEPTION, 0, 0);
 }
 
   void
 BX_CPU_C::NOP(bxInstruction_c *i)
 {
+}
+
+void BX_CPU_C::PREFETCH(bxInstruction_c *i)
+{
+#if BX_SUPPORT_SSE
+  BX_INSTR_PREFETCH_HINT(CPU_ID, i->nnn(), i->seg(), RMAddr(i));
+#else
+  UndefinedOpcode(i);
+#endif
 }
 
   void
