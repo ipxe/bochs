@@ -87,14 +87,11 @@ void BX_CPU_C::PrintMmxRegisters(void)
 
 void BX_CPU_C::PrepareMmxInstruction(void)
 {
-  if(! (BX_CPU_THIS_PTR v8086_mode())) 
-  {
-    if(BX_CPU_THIS_PTR cr0.ts)
-      exception(BX_NM_EXCEPTION, 0, 0);
+  if(BX_CPU_THIS_PTR cr0.ts)
+    exception(BX_NM_EXCEPTION, 0, 0);
 
-    if(BX_CPU_THIS_PTR cr0.em)
-      exception(BX_UD_EXCEPTION, 0, 0);
-  }
+  if(BX_CPU_THIS_PTR cr0.em)
+    exception(BX_UD_EXCEPTION, 0, 0);
 
   MMX_TWD = 0;
   MMX_TOS = 0;        /* Each time an MMX instruction is */
