@@ -1,0 +1,8 @@
+The Bochs development has been moved to the Subversion (SVN) repository.
+Please have a look at
+
+http://sourceforge.net/scm/?type=svn&group_id=12580
+
+for instructions to check out the repository or to browse it via ViewVC.
+
+The Bochs Project Team
