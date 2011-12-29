@@ -4053,6 +4053,9 @@ int bx_write_configuration(const char *rc, int overwrite)
     SIM->get_param_bool(BXPN_CPUID_TBM)->get(),
     SIM->get_param_bool(BXPN_CPUID_FMA4)->get());
 #endif
+#if BX_SUPPORT_VMX
+  fprintf(fp, ", vmx=%d", SIM->get_param_num(BXPN_CPUID_VMX)->get());
+#endif
 #if BX_SUPPORT_X86_64
   fprintf(fp, ", x86_64=%d, 1g_pages=%d, pcid=%d, fsgsbase=%d",
     SIM->get_param_bool(BXPN_CPUID_X86_64)->get(),
