@@ -290,7 +290,7 @@ void bx_init_options()
 
   // cpuid subtree
 #if BX_CPU_LEVEL >= 4
-  bx_list_c *cpuid_param = new bx_list_c(root_param, "cpuid", "CPUID Options", 28);
+  bx_list_c *cpuid_param = new bx_list_c(root_param, "cpuid", "CPUID Options", 29);
 
   new bx_param_string_c(cpuid_param,
       "vendor_string",
@@ -445,6 +445,13 @@ void bx_init_options()
       "mwait_is_nop", "Don't put CPU to sleep state by MWAIT",
       "Don't put CPU to sleep state by MWAIT",
       0);
+#endif
+#if BX_SUPPORT_VMX
+  new bx_param_num_c(cpuid_param,
+      "vmx", "Support for Intel VMX extensions emulation",
+      "Support for Intel VMX extensions emulation",
+      0, BX_SUPPORT_VMX,
+      1);
 #endif
 #endif
 
@@ -2739,6 +2746,10 @@ static int parse_line_formatted(const char *context, int num_params, char *param
         if (parse_param_bool(params[i], 5, BXPN_CPUID_FMA4) < 0) {
           PARSE_ERR(("%s: cpuid directive malformed.", context));
         }
+#endif
+#if BX_SUPPORT_VMX
+      } else if (!strncmp(params[i], "vmx=", 4)) {
+        SIM->get_param_num(BXPN_CPUID_VMX)->set(atol(&params[i][4]));
 #endif
 #if BX_SUPPORT_X86_64
       } else if (!strncmp(params[i], "x86_64=", 7)) {

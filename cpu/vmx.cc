@@ -1023,8 +1023,8 @@ Bit32u BX_CPU_C::VMenterLoadCheckGuestState(Bit64u *qualification)
      Bit32u ar = VMread32(VMCS_32BIT_GUEST_ES_ACCESS_RIGHTS + 2*n) >> 8;
      bx_bool invalid = (ar >> 16) & 1;
 
-     if (set_segment_ar_data(&guest.sregs[n], !invalid, 
-                  (Bit16u) selector, base, limit, (Bit16u) ar));
+     set_segment_ar_data(&guest.sregs[n], !invalid,
+                  (Bit16u) selector, base, limit, (Bit16u) ar);
 
      if (v8086_guest) {
         // guest in V8086 mode
@@ -1466,8 +1466,7 @@ Bit32u BX_CPU_C::VMenterLoadCheckGuestState(Bit64u *qualification)
     }
   }
 
-  if (! x86_64_guest && (guest.cr4 & BX_CR4_PAE_MASK) != 0) {
-    // CR0.PG is always set in VMX mode
+  if (! x86_64_guest && (guest.cr4 & BX_CR4_PAE_MASK) != 0 && /* CR0.PG is set */ ((guest.cr0 >> 31) & 1) != 0) {
 #if BX_SUPPORT_VMX >= 2
     if (vm->vmexec_ctrls3 & VMX_VM_EXEC_CTRL3_EPT_ENABLE) {
       for (n=0;n<4;n++)
@@ -1815,8 +1814,9 @@ void BX_CPU_C::VMexitSaveGuestState(void)
         if (! CheckPDPTR(BX_CPU_THIS_PTR cr3))
           BX_PANIC(("VMEXIT: PDPTR cache is not valid !"));
       }
-      for(n=0; n<4; n++)
+      for(n=0; n<4; n++) {
         VMwrite64(VMCS_64BIT_GUEST_IA32_PDPTE0 + 2*n, BX_CPU_THIS_PTR PDPTR_CACHE.entry[n]);
+      }
     }
   }
 #endif
@@ -2393,9 +2393,12 @@ BX_INSF_TYPE BX_CPP_AttrRegparmN(1) BX_CPU_C::VMLAUNCH(bxInstruction_c *i)
     exception(BX_UD_EXCEPTION, 0);
 
   unsigned vmlaunch = 0;
-  if ((i->rm() & 0x7) == 0x2) {
+  if ((i->getIaOpcode() == BX_IA_VMLAUNCH)) {
     BX_INFO(("VMLAUNCH VMCS ptr: 0x" FMT_ADDRX64, BX_CPU_THIS_PTR vmcsptr));
     vmlaunch = 1;
+  }
+  else {
+    BX_INFO(("VMRESUME VMCS ptr: 0x" FMT_ADDRX64, BX_CPU_THIS_PTR vmcsptr));
   }
 
   if (BX_CPU_THIS_PTR in_vmx_guest) {
@@ -2543,7 +2546,7 @@ BX_INSF_TYPE BX_CPP_AttrRegparmN(1) BX_CPU_C::VMLAUNCH(bxInstruction_c *i)
     }
     else {
       // activate VMX preemption timer
-      BX_INFO(("VMX preemption timer active"));
+      BX_DEBUG(("VMX preemption timer active"));
       BX_CPU_THIS_PTR pending_vmx_timer_expired = 0;
       BX_CPU_THIS_PTR lapic.set_vmx_preemption_timer(timer_value);
     }
