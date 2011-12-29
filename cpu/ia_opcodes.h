@@ -1313,7 +1313,7 @@ bx_define_opcode(BX_IA_SGDT64_Ms, &BX_CPU_C::SGDT64_Ms, &BX_CPU_C::BxError, 0, 0
 bx_define_opcode(BX_IA_SIDT64_Ms, &BX_CPU_C::SIDT64_Ms, &BX_CPU_C::BxError, 0, 0)
 bx_define_opcode(BX_IA_LGDT64_Ms, &BX_CPU_C::LGDT64_Ms, &BX_CPU_C::BxError, 0, 0)
 bx_define_opcode(BX_IA_LIDT64_Ms, &BX_CPU_C::LIDT64_Ms, &BX_CPU_C::BxError, 0, 0)
-bx_define_opcode(BX_IA_CMPXCHG16B, &BX_CPU_C::CMPXCHG16B, &BX_CPU_C::BxError, 0, 0)
+bx_define_opcode(BX_IA_CMPXCHG16B, &BX_CPU_C::CMPXCHG16B, &BX_CPU_C::BxError, BX_ISA_CMPXCHG16B, 0)
 bx_define_opcode(BX_IA_LOOPNE64_Jb, NULL, &BX_CPU_C::LOOPNE64_Jb, 0, 0)
 bx_define_opcode(BX_IA_LOOPE64_Jb, NULL, &BX_CPU_C::LOOPE64_Jb, 0, 0)
 bx_define_opcode(BX_IA_LOOP64_Jb, NULL, &BX_CPU_C::LOOP64_Jb, 0, 0)
@@ -1366,7 +1366,7 @@ bx_define_opcode(BX_IA_VMWRITE_GqEq, &BX_CPU_C::VMWRITE, &BX_CPU_C::VMWRITE, BX_
 bx_define_opcode(BX_IA_INVEPT, &BX_CPU_C::INVEPT, &BX_CPU_C::BxError, BX_ISA_VMX, 0)
 bx_define_opcode(BX_IA_INVVPID, &BX_CPU_C::INVVPID, &BX_CPU_C::BxError, BX_ISA_VMX, 0)
 #endif
-bx_define_opcode(BX_IA_VMFUNC, &BX_CPU_C::VMFUNC, &BX_CPU_C::VMFUNC, BX_ISA_VMX, 0)
+bx_define_opcode(BX_IA_VMFUNC, &BX_CPU_C::BxError, &BX_CPU_C::VMFUNC, BX_ISA_VMX, 0)
 // VMX
 
 // SMX
