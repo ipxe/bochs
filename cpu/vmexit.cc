@@ -379,7 +379,7 @@ void BX_CPP_AttrRegparmN(3) BX_CPU_C::VMexit_TaskSwitch(bxInstruction_c *i, Bit1
   VMexit(i, VMX_VMEXIT_TASK_SWITCH, tss_selector | (source << 30));
 }
 
-vmexit.ccvoid BX_CPP_AttrRegparmN(3) BX_CPU_C::VMexit_MSR(bxInstruction_c *i, unsigned op, Bit32u msr)
+void BX_CPP_AttrRegparmN(3) BX_CPU_C::VMexit_MSR(bxInstruction_c *i, unsigned op, Bit32u msr)
 {
   BX_ASSERT(BX_CPU_THIS_PTR in_vmx_guest);
 
@@ -429,7 +429,7 @@ void BX_CPP_AttrRegparmN(3) BX_CPU_C::VMexit_IO(bxInstruction_c *i, unsigned por
   BX_ASSERT(BX_CPU_THIS_PTR in_vmx_guest);
   BX_ASSERT(port <= 0xFFFF);
 
-  bool vmexit = 0;
+  bx_bool vmexit = 0;
 
   if (VMEXIT(VMX_VM_EXEC_CTRL2_IO_BITMAPS)) {
      // always VMEXIT on port "wrap around" case
