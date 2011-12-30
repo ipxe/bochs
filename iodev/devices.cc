@@ -188,15 +188,11 @@ void bx_devices_c::init(BX_MEM_C *newmem)
 #if BX_SUPPORT_PCIUSB
     PLUG_load_plugin(usb_common, PLUGTYPE_CORE);
 #endif
-  } else {
-    plugin_ctrl = (bx_list_c*)SIM->get_param(BXPN_PLUGIN_CTRL);
-    SIM->get_param_bool(BX_PLUGIN_PCI_IDE, plugin_ctrl)->set(0);
-    SIM->get_param_bool(BX_PLUGIN_ACPI, plugin_ctrl)->set(0);
-  }
+    PLUG_load_plugin(acpi, PLUGTYPE_OPTIONAL);
 #else
     BX_ERROR(("Bochs is not compiled with PCI support"));
-  }
 #endif
+  }
 
   // optional plugins not controlled by separate option
   plugin_ctrl = (bx_list_c*)SIM->get_param(BXPN_PLUGIN_CTRL);
@@ -230,31 +226,27 @@ void bx_devices_c::init(BX_MEM_C *newmem)
         PLUG_load_plugin(iodebug, PLUGTYPE_OPTIONAL);
       }
 #endif
-#if BX_SUPPORT_PCI
-      else if (!strcmp(plugname, BX_PLUGIN_PCI_IDE)) {
-        PLUG_load_plugin(pci_ide, PLUGTYPE_OPTIONAL);
-      }
-      else if (!strcmp(plugname, BX_PLUGIN_ACPI)) {
-        PLUG_load_plugin(acpi, PLUGTYPE_OPTIONAL);
-      }
-#endif
-#if BX_SUPPORT_APIC
-      else if (!strcmp(plugname, BX_PLUGIN_IOAPIC)) {
-        PLUG_load_plugin(ioapic, PLUGTYPE_OPTIONAL);
-      }
-#endif
 #endif
     }
   }
 
+#if BX_SUPPORT_APIC
+  PLUG_load_plugin(ioapic, PLUGTYPE_OPTIONAL);
+#endif
   PLUG_load_plugin(keyboard, PLUGTYPE_OPTIONAL);
 #if BX_SUPPORT_BUSMOUSE
   if (mouse_type == BX_MOUSE_TYPE_BUS) {
     PLUG_load_plugin(busmouse, PLUGTYPE_OPTIONAL);
   }
 #endif
-  if (is_harddrv_enabled())
+  if (is_harddrv_enabled()) {
     PLUG_load_plugin(harddrv, PLUGTYPE_OPTIONAL);
+#if BX_SUPPORT_PCI
+    if (SIM->get_param_bool(BXPN_I440FX_SUPPORT)->get()) {
+      PLUG_load_plugin(pci_ide, PLUGTYPE_OPTIONAL);
+    }
+#endif
+  }
   if (is_serial_enabled())
     PLUG_load_plugin(serial, PLUGTYPE_OPTIONAL);
   if (is_parallel_enabled())

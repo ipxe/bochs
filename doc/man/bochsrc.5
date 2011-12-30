@@ -1,5 +1,5 @@
 .\"Document Author:  Timothy R. Butler   -   tbutler@uninetsolutions.com"
-.TH bochsrc 5 "27 Nov 2011" "bochsrc" "The Bochs Project"
+.TH bochsrc 5 "30 Dec 2011" "bochsrc" "The Bochs Project"
 .\"SKIP_SECTION"
 .SH NAME
 bochsrc \- Configuration file for Bochs.
@@ -898,18 +898,18 @@ Defines the characteristics of an attached ne2000 isa card :
 
 .B PROPERTIES FOR ne2k:
 
-ioaddr, irq:
+IOADDR, IRQ:
 You probably won't need to change ioaddr and irq, unless there are IRQ conflicts.
 These parameters are ignored if the NE2000 is assigned to a PCI slot.
 
-mac:
+MAC:
 The MAC address MUST NOT match the address of any machine on the net.
 Also, the first byte must be an even number (bit 0 set means a multicast
 address), and you cannot use ff:ff:ff:ff:ff:ff because that's the broadcast
 address.  For the ethertap module, you must use fe:fd:00:00:00:01.  There may
 be other restrictions too.  To be safe, just use the b0:c4... address.
 
-ethmod:
+ETHMOD:
 The ethmod value defines which low level OS specific module to be used
 to access physical ethernet interface. Current implemented values include
  - fbsd   : ethernet on freebsd and openbsd
@@ -926,23 +926,23 @@ you can use the following 'ethmod's to simulate a virtual network.
  - vnet   : ARP, ICMP-echo(ping), DHCP and TFTP are simulated
             The virtual host uses 192.168.10.1
             DHCP assigns 192.168.10.2 to the guest
-            The TFTP server use ethdev for the root directory and doesn't
+            The TFTP server use 'ethdev' for the root directory and doesn't
             overwrite files
 
-ethdev:
+ETHDEV:
 The ethdev value is the name of the network interface on your host
-platform.  On UNIX machines, you can get the name by running ifconfig.  On
+platform.  On UNIX machines, you can get the name by running ifconfig. On
 Windows machines, you must run niclist to get the name of the ethdev.
 Niclist source code is in misc/niclist.c and it is included in Windows
 binary releases.
 
-script:
+SCRIPT:
 The script value is optional, and is the name of a script that
 is executed after bochs initialize the network interface. You can use
 this script to configure this network interface, or enable masquerading.
 This is mainly useful for the tun/tap devices that only exist during
 Bochs execution. The network interface name is supplied to the script
-as first parameter
+as first parameter.
 
 Examples:
   ne2k: ioaddr=0x300, irq=9, mac=b0:c4:20:00:00:00, ethmod=fbsd, ethdev=xlo

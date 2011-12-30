@@ -50,12 +50,17 @@ Attached devices
   |        |
   |        +---- CD/DVD-ROM image / device access (*)           cdrom.cc
   |                      |
-  |                      +---- Host specific Module             cdrom_amigaos.cc
+  |                      +---- Host specific Modules
+  |                                   |
+  |                                   +---- Amiga/MorphOS       cdrom_amigaos.cc
+  |                                   +---- Windows             cdrom_win32.cc
+  |                                   +---- Mac OSX             cdrom_osx.cc
+  |                                   +---- Linux and others    cdrom_misc.cc
   +---- Network Support
   |        |
   |        +---- Network Devices
   |        |             |
-  |        |             +---- NE2000 (ISA/PCI)                 ne2k.cc, pcipnic.cc
+  |        |             +---- NE2000 (ISA/PCI)                 ne2k.cc
   |        |             +---- PCI Pseudo NIC                   pcipnic.cc
   |        |
   |        +---- Networking Modules                             netmod.cc

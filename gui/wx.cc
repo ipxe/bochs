@@ -1083,17 +1083,7 @@ void bx_wx_gui_c::statusbar_setitem(int element, bx_bool active, bx_bool w)
   wxMutexGuiEnter();
   if (element < 0) {
     for (unsigned i = 0; i < statusitem_count; i++) {
-      if (active) {
-#if defined(__WXMSW__)
-        status_text[0] = 9;
-        strcpy(status_text+1, statusitem_text[i]);
-        theFrame->SetStatusText(status_text, i+1);
-#else
-        theFrame->SetStatusText(wxString(statusitem_text[i], wxConvUTF8), i+1);
-#endif
-      } else {
-        theFrame->SetStatusText(wxT(""), i+1);
-      }
+      theFrame->SetStatusText(wxT(""), i+1);
     }
   } else if ((unsigned)element < statusitem_count) {
     if (active) {

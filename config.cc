@@ -1733,13 +1733,6 @@ void bx_init_options()
 #if BX_SUPPORT_IODEBUG
   new bx_param_bool_c(menu, "iodebug", "Enable 'iodebug'", "", 1);
 #endif
-#if BX_SUPPORT_PCI
-  new bx_param_bool_c(menu, "pci_ide", "Enable 'pci_ide'", "", 1);
-  new bx_param_bool_c(menu, "acpi", "Enable 'acpi'", "", 1);
-#endif
-#if BX_SUPPORT_APIC
-  new bx_param_bool_c(menu, "ioapic", "Enable 'ioapic'", "", 1);
-#endif
 
 #if BX_PLUGINS
   // user plugin options

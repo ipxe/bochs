@@ -97,8 +97,8 @@ void bx_pcipnic_c::reset(unsigned type)
     { 0x01, PNIC_PCI_VENDOR >> 8 },
     { 0x02, PNIC_PCI_DEVICE & 0xff },
     { 0x03, PNIC_PCI_DEVICE >> 8 },
-    { 0x04, 0x05 }, { 0x05, 0x00 },	// command_io
-    { 0x06, 0x80 }, { 0x07, 0x02 },	// status
+    { 0x04, 0x01 }, { 0x05, 0x00 }, // command_io
+    { 0x06, 0x00 }, { 0x07, 0x00 }, // status
     { 0x08, 0x01 },                 // revision number
     { 0x09, 0x00 },                 // interface
     { 0x0a, 0x00 },                 // class_sub
@@ -158,7 +158,7 @@ void bx_pcipnic_c::after_restore_state(void)
 {
   if (DEV_pci_set_base_io(BX_PNIC_THIS_PTR, read_handler, write_handler,
                           &BX_PNIC_THIS pci_base_address[4],
-                          &BX_PNIC_THIS pci_conf[0x10],
+                          &BX_PNIC_THIS pci_conf[0x20],
                           16, &pnic_iomask[0], "PNIC")) {
     BX_INFO(("new base address: 0x%04x", BX_PNIC_THIS pci_base_address[4]));
   }
@@ -314,14 +314,12 @@ void bx_pcipnic_c::pci_write_handler(Bit8u address, Bit32u value, unsigned io_le
     value8 = (value >> (i*8)) & 0xFF;
     oldval = BX_PNIC_THIS pci_conf[address+i];
     switch (address+i) {
-      case 0x3d: //
-      case 0x05: // disallowing write to command hi-byte
-      case 0x06: // disallowing write to status lo-byte (is that expected?)
+      case 0x04:
+        value8 &= 0x01;
         break;
       case 0x3c:
         if (value8 != oldval) {
           BX_INFO(("new irq line = %d", value8));
-          BX_PNIC_THIS pci_conf[address+i] = value8;
         }
         break;
       case 0x20:
@@ -330,9 +328,11 @@ void bx_pcipnic_c::pci_write_handler(Bit8u address, Bit32u value, unsigned io_le
       case 0x22:
       case 0x23:
         baseaddr_change = (value8 != oldval);
+        break;
       default:
-        BX_PNIC_THIS pci_conf[address+i] = value8;
+        value8 = oldval;
     }
+    BX_PNIC_THIS pci_conf[address+i] = value8;
   }
   if (baseaddr_change) {
     if (DEV_pci_set_base_io(BX_PNIC_THIS_PTR, read_handler, write_handler,

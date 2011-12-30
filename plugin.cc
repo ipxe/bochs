@@ -427,17 +427,13 @@ void plugin_load(char *name, char *args, plugintype_t type)
     sprintf(buf, PLUGIN_INIT_FMT_STRING, "user");
   }
 #if defined(_MSC_VER)
-  plugin->plugin_init =
-      (int (*)(struct _plugin_t *, enum plugintype_t, int, char *[])) /* monster typecast */
-      GetProcAddress(plugin->handle, buf);
+  plugin->plugin_init = (plugin_init_t) GetProcAddress(plugin->handle, buf);
   if (plugin->plugin_init == NULL) {
     pluginlog->panic("could not find plugin_init: error=%d", GetLastError());
     plugin_abort ();
   }
 #else
-  plugin->plugin_init =
-      (int (*)(struct _plugin_t *, enum plugintype_t, int, char *[])) /* monster typecast */
-      lt_dlsym (plugin->handle, buf);
+  plugin->plugin_init = (plugin_init_t) lt_dlsym (plugin->handle, buf);
   if (plugin->plugin_init == NULL) {
     pluginlog->panic("could not find plugin_init: %s", lt_dlerror ());
     plugin_abort ();
@@ -450,13 +446,13 @@ void plugin_load(char *name, char *args, plugintype_t type)
     sprintf(buf, PLUGIN_FINI_FMT_STRING, "user");
   }
 #if defined(_MSC_VER)
-  plugin->plugin_fini = (void (*)(void)) GetProcAddress(plugin->handle, buf);
+  plugin->plugin_fini = (plugin_fini_t) GetProcAddress(plugin->handle, buf);
   if (plugin->plugin_fini == NULL) {
     pluginlog->panic("could not find plugin_fini: error=%d", GetLastError());
     plugin_abort ();
   }
 #else
-  plugin->plugin_fini = (void (*)(void)) lt_dlsym (plugin->handle, buf);
+  plugin->plugin_fini = (plugin_fini_t) lt_dlsym (plugin->handle, buf);
   if (plugin->plugin_fini == NULL) {
     pluginlog->panic("could not find plugin_fini: %s", lt_dlerror ());
     plugin_abort();

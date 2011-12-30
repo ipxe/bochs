@@ -247,6 +247,9 @@ sound
     wavemode
     loglevel
     dmatimer
+  es1370
+    enabled
+    wavedev
 
 misc
   port_e9_hack
@@ -280,5 +283,3 @@ wxdebug
 
 user
   (subtree for user-defined options)
-
-(updated July 31, 2011 by vruppert)
