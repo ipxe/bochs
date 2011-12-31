@@ -34,7 +34,7 @@ MOTHER BOARD (i440FX Support)                                   devices.cc
   |        |
   |        +---- Standard PC gameport                           gameport.cc
   |
-  +-------------- Debugging/Instrumentation                     biosdev.cc, iodebug.cc, unmapped.cc
+  +------------- Debugging/Instrumentation                      biosdev.cc, iodebug.cc, unmapped.cc
 
 Attached devices
   |

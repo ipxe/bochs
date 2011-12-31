@@ -463,17 +463,29 @@ void bx_devices_c::exit()
   bx_virt_timer.setup();
   bx_slowdown_timer.exit();
 
+  // unload optional and user plugins first
+  bx_unload_plugins();
+
   PLUG_unload_plugin(pit);
   PLUG_unload_plugin(cmos);
   PLUG_unload_plugin(dma);
   PLUG_unload_plugin(pic);
   PLUG_unload_plugin(vga);
   PLUG_unload_plugin(floppy);
+#if BX_SUPPORT_SOUNDLOW
+  PLUG_unload_plugin(soundmod);
+#endif
+#if BX_NETWORKING
+  PLUG_unload_plugin(netmod);
+#endif
 #if BX_SUPPORT_PCI
   PLUG_unload_plugin(pci);
   PLUG_unload_plugin(pci2isa);
+#if BX_SUPPORT_PCIUSB
+  PLUG_unload_plugin(usb_common);
 #endif
-  bx_unload_plugins();
+#endif
+  PLUG_unload_plugin(hdimage);
   init_stubs();
 }
 
@@ -1239,5 +1251,5 @@ void bx_pci_device_stub_c::load_pci_rom(const char *path)
   }
   close(fd);
 
-  BX_INFO(("loaded PCI ROM '%s' (size=%u)", path, (unsigned) stat_buf.st_size));
+  BX_INFO(("loaded PCI ROM '%s' (size=%u / PCI=%uk)", path, (unsigned) stat_buf.st_size, pci_rom_size >> 10));
 }
