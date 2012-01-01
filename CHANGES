@@ -1,3 +1,41 @@
+Changes in 2.5.1 (not yet released):
+
+- CPU / Debugger / Instrumentation (TODO: Stanislav, please review this)
+  - BMI instructions flags update fix
+  - simplify x87 polinoms evaluation code
+  - fixed typo - closing SF bug [3461405] step all command fails in SMP mode
+  - VMX: Fixed VMFUNC instruction behavior to align with Intel SDM revision 041
+  - instrumentation: added special indication for indirect call/jump
+  - improve VMX debug prints
+  - VMX: fixed VirtualBox VMX guest Guru Meditation - FS.BASE get corrupted after
+    saving/restoring unusable selector
+  - better report supported CPUID features when not using pre-defined CPUID profile
+  - added athlon64_venice to CPUDB, small apic fixes
+
+- Configure and compile
+  - fixed compilation err in instrumentation call (tasking.cc)
+  - fixed compilation err with x86 hw breakpoint enabled and CPU_LEVEL < 6
+  - fixed compilation issue under win32 --with-nogui
+  - added missing dependencies for cdrom_osx.o
+  - several other compilation warning fixed
+  - removed very old deprecated configure options from configure script
+
+- I/O Devices
+  - fixed possible failures of PCI DMA transfers
+  - VVFAT: several fixes in the optional write support (passes test with XP)
+  - USB UHCI: some fixes to make it work in XP guest
+  - removed devices 'acpi', 'ioapic' and 'pci_ide' from optional plugin control
+    to avoid trouble
+
+- Config interface / GUI and display libraries
+  - fix for x86-64 .bochsrc option parsing (patch from @SF)
+  - fix for @SF bug: Crash on WIN2K - ID: 3454214
+  - added VMX .bochsrc option to ctoggle VMX ON/OFF on runtime
+  - added 'nokeyrepeat' option for the SDL and win32 gui
+
+- minor other bugfixes / cleanups
+- several documentation updates / cleanups
+-------------------------------------------------------------------------
 Changes in 2.5 (November 27, 2011):
 
          Bochs repository moved to the SVN version control !
