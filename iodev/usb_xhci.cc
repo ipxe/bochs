@@ -1450,7 +1450,7 @@ bx_bool bx_usb_xhci_c::write_handler(bx_phy_address addr, unsigned len, void *da
       // doorbell = slot to use (1 based)
       // (value & 0xFF) = ep (1 = control, 2 = ep1 out, 3 = ep1 in, etc);
       int ep = (value & 0xFF);
-      BX_INFO(("Rang Doorbell:  slot = %i  ep = %i (%s)", doorbell, ep, (ep & 1) ? "IN" : "OUT"));
+      BX_DEBUG(("Rang Doorbell:  slot = %i  ep = %i (%s)", doorbell, ep, (ep & 1) ? "IN" : "OUT"));
       if (ep > 31)
         BX_ERROR(("Doorbell rang with EP > 31  (ep = %i)", ep));
       else
@@ -1545,7 +1545,7 @@ void bx_usb_xhci_c::process_transfer_ring(const int slot, const int ep)
           if (TRB_TOGGLE(trb.command))
             BX_XHCI_THIS hub.slots[slot].ep_context[ep].rcs ^= 1;
           BX_XHCI_THIS hub.slots[slot].ep_context[ep].enqueue_pointer = trb.parameter & (Bit64u) ~0xF;
-          BX_INFO(("0x" FORMATADDRESS ": Transfer Ring (slot = %i) (ep = %i): LINK TRB:  New dq_pointer = 0x" FMT_ADDRX64 " (%i)",
+          BX_DEBUG(("0x" FORMATADDRESS ": Transfer Ring (slot = %i) (ep = %i): LINK TRB:  New dq_pointer = 0x" FMT_ADDRX64 " (%i)",
             (bx_phy_address) org_addr, slot, ep, BX_XHCI_THIS hub.slots[slot].ep_context[ep].enqueue_pointer, BX_XHCI_THIS hub.slots[slot].ep_context[ep].rcs));
 #if ((VERSION_MAJOR == 0) && (VERSION_MINOR == 0x95))
           // https://patchwork.kernel.org/patch/51191/
@@ -1559,7 +1559,7 @@ void bx_usb_xhci_c::process_transfer_ring(const int slot, const int ep)
         case SETUP_STAGE:
           cur_direction = USB_TOKEN_SETUP;
           is_transfer_trb = 1;
-          BX_INFO(("0x" FORMATADDRESS ": Transfer Ring (slot = %i) (ep = %i) (len = %i): Found SETUP TRB", 
+          BX_DEBUG(("0x" FORMATADDRESS ": Transfer Ring (slot = %i) (ep = %i) (len = %i): Found SETUP TRB", 
             (bx_phy_address) org_addr, slot, ep, transfer_length));
           break;
 
@@ -1567,7 +1567,7 @@ void bx_usb_xhci_c::process_transfer_ring(const int slot, const int ep)
         case DATA_STAGE:
           cur_direction = TRB_GET_DIR(trb.command);
           is_transfer_trb = 1;
-          BX_INFO(("0x" FORMATADDRESS ": Transfer Ring (slot = %i) (ep = %i) (len = %i): Found DATA STAGE TRB", 
+          BX_DEBUG(("0x" FORMATADDRESS ": Transfer Ring (slot = %i) (ep = %i) (len = %i): Found DATA STAGE TRB", 
             (bx_phy_address) org_addr, slot, ep, transfer_length));
           break;
 
@@ -1576,14 +1576,14 @@ void bx_usb_xhci_c::process_transfer_ring(const int slot, const int ep)
           cur_direction = TRB_GET_DIR(trb.command);
           is_transfer_trb = 1;
           transfer_length = 0;
-          BX_INFO(("0x" FORMATADDRESS ": Transfer Ring (slot = %i) (ep = %i): Found STATUS STAGE TRB", 
+          BX_DEBUG(("0x" FORMATADDRESS ": Transfer Ring (slot = %i) (ep = %i): Found STATUS STAGE TRB", 
             (bx_phy_address) org_addr, slot, ep));
           break;
 
         // Normal TRB
         case NORMAL:
           is_transfer_trb = 1;
-          BX_INFO(("0x" FORMATADDRESS ": Transfer Ring (slot = %i) (ep = %i) (len = %i): Found NORMAL TRB", 
+          BX_DEBUG(("0x" FORMATADDRESS ": Transfer Ring (slot = %i) (ep = %i) (len = %i): Found NORMAL TRB", 
             (bx_phy_address) org_addr, slot, ep, transfer_length));
           break;
 
@@ -1598,7 +1598,7 @@ void bx_usb_xhci_c::process_transfer_ring(const int slot, const int ep)
           }
           if (spd_occurred)
             first_event_trb_encountered = 1;
-          BX_INFO(("0x" FORMATADDRESS ": Transfer Ring (slot = %i) (ep = %i): Found EVENT_DATA TRB: (returning %i)", 
+          BX_DEBUG(("0x" FORMATADDRESS ": Transfer Ring (slot = %i) (ep = %i): Found EVENT_DATA TRB: (returning %i)", 
             (bx_phy_address) org_addr, slot, ep, comp_code));
           break;
 
@@ -1644,7 +1644,7 @@ void bx_usb_xhci_c::process_transfer_ring(const int slot, const int ep)
             } else {
               ret = BX_XHCI_THIS broadcast_packet(&packet, port_num - 1);
               len = transfer_length;
-              BX_INFO(("OUT: Transferred %i bytes (ret = %i)", len, ret));
+              BX_DEBUG(("OUT: Transferred %i bytes (ret = %i)", len, ret));
             }
             break;
           case USB_TOKEN_IN:
@@ -1654,7 +1654,7 @@ void bx_usb_xhci_c::process_transfer_ring(const int slot, const int ep)
               bytes_transferred += len;
               if (len > 0)
                 DEV_MEM_WRITE_PHYSICAL_DMA((bx_phy_address) address, len, BX_XHCI_THIS device_buffer);
-              BX_INFO(("IN: Transferred %i bytes, requested %i bytes", len, transfer_length));
+              BX_DEBUG(("IN: Transferred %i bytes, requested %i bytes", len, transfer_length));
               if (len < transfer_length) {
                 bytes_not_transferred = transfer_length - len;
                 spd_occurred = 1;
@@ -1681,7 +1681,7 @@ void bx_usb_xhci_c::process_transfer_ring(const int slot, const int ep)
         if (ioc) {
           if ((comp_code == TRB_SUCCESS) && spd_occurred && TRB_SPD(trb.command)) {
             comp_code = SHORT_PACKET;
-            BX_INFO(("Sending Short Packet Detect Event TRB (%i)", bytes_not_transferred));
+            BX_DEBUG(("Sending Short Packet Detect Event TRB (%i)", bytes_not_transferred));
           }
           // create a Event TRB
           write_event_TRB(int_target, org_addr, TRB_SET_COMP_CODE(comp_code) | bytes_not_transferred, 
@@ -1701,7 +1701,7 @@ void bx_usb_xhci_c::process_transfer_ring(const int slot, const int ep)
     read_TRB((bx_phy_address) BX_XHCI_THIS hub.slots[slot].ep_context[ep].enqueue_pointer, &trb);
   }
 
-  BX_INFO(("Process Transfer Ring: Processed %i TRB's", trb_count));
+  BX_DEBUG(("Process Transfer Ring: Processed %i TRB's", trb_count));
   if (trb_count == 0)
     BX_ERROR(("Process Transfer Ring: Doorbell rang, but no TRB's were enqueued in the ring."));
 }
@@ -2601,7 +2601,7 @@ void bx_usb_xhci_c::usb_set_connect_status(Bit8u port, int type, bx_bool connect
 
     // we changed the value of the port, so show it
     BX_INFO(("Port Status Change Event."));
-    write_event_TRB(0, (port << 24), TRB_SET_COMP_CODE(1), TRB_SET_TYPE(PORT_STATUS_CHANGE), 1);
+    write_event_TRB(0, ((port + 1) << 24), TRB_SET_COMP_CODE(1), TRB_SET_TYPE(PORT_STATUS_CHANGE), 1);
   }
 }
 
