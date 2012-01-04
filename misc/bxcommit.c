@@ -44,6 +44,7 @@ int snprintf(char *s, size_t maxlen, const char *format, ...)
 #endif  /* !BX_HAVE_SNPRINTF */
 
 #include "../osdep.h"
+#include "bswap.h"
 
 #define HDIMAGE_HEADERS_ONLY 1
 #include "../iodev/hdimage.h"
