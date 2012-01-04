@@ -359,7 +359,7 @@ void bx_init_options()
 
   new bx_param_bool_c(cpuid_param,
       "sse4a", "Support for AMD SSE4A instructions",
-      "Support for AMD SSE4A instructionã",
+      "Support for AMD SSE4A instructions",
       0);
 
   new bx_param_bool_c(cpuid_param,
