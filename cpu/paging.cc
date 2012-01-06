@@ -478,12 +478,6 @@ BX_INSF_TYPE BX_CPP_AttrRegparmN(1) BX_CPU_C::INVLPG(bxInstruction_c* i)
     VMexit_INVLPG(i, laddr);
 #endif
 
-#if BX_SUPPORT_SVM
-  if (BX_CPU_THIS_PTR in_svm_guest) {
-    if (SVM_INTERCEPT(SVM_INTERCEPT0_INVLPG)) Svm_Vmexit(SVM_VMEXIT_INVLPG);
-  }
-#endif
-
 #if BX_SUPPORT_X86_64
   if (IsCanonical(laddr))
 #endif
@@ -515,10 +509,6 @@ void BX_CPU_C::page_fault(unsigned fault, bx_address laddr, unsigned user, unsig
     if (BX_CPU_THIS_PTR cr4.get_PAE() && BX_CPU_THIS_PTR efer.get_NXE())
       error_code |= ERROR_CODE_ACCESS;
   }
-#endif
-
-#if BX_SUPPORT_SVM
-  SvmInterceptException(BX_HARDWARE_EXCEPTION, BX_PF_EXCEPTION, error_code, 1, laddr); // before the CR2 was modified
 #endif
 
 #if BX_SUPPORT_VMX
